@@ -5,22 +5,25 @@ const bodyParser = require('body-parser');
 const nodemailer = require('nodemailer');
 
 const app = express();
-const port = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(bodyParser.json());
 
-app.get('/', (req, res) => res.send('Oracle69 Contact API Running'));
+app.get('/', (req, res) => {
+  res.send('Oracle69 Contact API running');
+});
 
+// Add your email sending route here (example):
 app.post('/send', async (req, res) => {
   const { name, email, message } = req.body;
-
+  
   if (!name || !email || !message) {
-    return res.status(400).json({ error: 'All fields required' });
+    return res.status(400).json({ error: 'Missing required fields' });
   }
 
   try {
-    const transporter = nodemailer.createTransport({
+    let transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
         user: process.env.EMAIL_FROM,
@@ -31,8 +34,8 @@ app.post('/send', async (req, res) => {
     await transporter.sendMail({
       from: process.env.EMAIL_FROM,
       to: process.env.EMAIL_TO,
-      subject: `Contact form message from ${name}`,
-      text: `Name: ${name}\nEmail: ${email}\nMessage: ${message}`,
+      subject: `Contact Form: ${name}`,
+      text: `Email: ${email}\nMessage: ${message}`,
     });
 
     res.json({ success: true, message: 'Email sent' });
@@ -41,4 +44,6 @@ app.post('/send', async (req, res) => {
   }
 });
 
-app.listen(port, () => console.log(`Server running on port ${port}`));
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
